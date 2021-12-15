@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>The Web Gallery</title>
+    <link rel="stylesheet" href="./style/main.css" />
+    <link rel="stylesheet" href="./style/form.css" />
+  </head>
+  <body>
+    <h1>The Web Gallery!</h1>
+    <div class="uploadImageDiv">
+      <h3>Please fill in all the fields</h3>
+      <input
+        type="submit"
+        id="hideImageFormBtn"
+        value="Hide/Show Image Form"
+        name="hideImageFormBtn"
+      />
+      <form class="createImgForm">
+        <div class="toggleHiddenElmts">
+          <label for="imageTitle">Image Title</label>
+          <input
+            type="text"
+            id="imageTitle"
+            placeholder="Image Title"
+            name="imageTitle"
+            class="imageFormTitle"
+            required
+          />
+        </div>
+
+        <div class="toggleHiddenElmts">
+          <label for="imageAuthor">Image Author</label>
+          <input
+            type="text"
+            id="imageAuthor"
+            placeholder="Image Author"
+            name="imageAuthor"
+            class="imageFormAuthor"
+            required
+          />
+        </div>
+
+        <div class="toggleHiddenElmts">
+          <label for="imageURL">Image URL</label>
+          <input
+            type="text"
+            id="imageURL"
+            placeholder="Image URL"
+            name="imageURL"
+            class="imageFormURL"
+            required
+          />
+        </div>
+
+        <input
+          type="submit"
+          value="Submit"
+          id="submitImgBtn"
+          class="toggleHiddenElmts"
+          name="submitImgBtn"
+        />
+      </form>
+    </div>
+
+    <div class="images"></div>
+
+    <div id="commentsForm" class="commentsForm">
+      <h1 class="commentsTxt">Comments</h1>
+      <form id="addCommentForm" class="addCommentForm">
+        <input
+          type="text"
+          id="commentAuthorName"
+          placeholder="Author Name"
+          name="commentAuthorName"
+          required
+        />
+
+        <input
+          type="text"
+          id="commentText"
+          placeholder="Text"
+          name="commentText"
+          required
+        />
+
+        <input
+          type="submit"
+          value="Submit"
+          id="submitCommBtn"
+          name="submitCommBtn"
+        />
+
+        <input type="button" value="Prev" class="commentsPrevBtn" />
+        <input type="button" value="Next" class="commentsNextBtn" />
+      </form>
+    </div>
+
+    <div class="comments"></div>
+  </body>
+
+  <footer>
+    <a href="/credits.html" class="credits">credits</a>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/index.js"></script>
+</html>

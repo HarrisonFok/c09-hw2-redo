@@ -1,0 +1,40 @@
+body {
+  background: #076585;
+  background: -webkit-linear-gradient(to left, #fff, #076585);
+  background: linear-gradient(to right, #fff, #15a3d3);
+}
+
+h1 {
+  text-align: center;
+  border: 3px solid blue;
+  width: 500px;
+  margin: 0 auto 30px;
+}
+
+.uploadImageDiv,
+.commentsDiv,
+.credits,
+.addCommentForm,
+.footer {
+  padding-left: 35%;
+  padding-bottom: 20px;
+}
+
+.comments {
+  padding-left: 20%;
+}
+
+.images {
+  width: 60%;
+  height: 40%;
+  margin: 0 auto 30px;
+  border: solid red 2px;
+}
+
+.imagesInfo {
+  padding-left: 350px;
+}
+
+.imagesBtns {
+  margin-left: 350px;
+}
