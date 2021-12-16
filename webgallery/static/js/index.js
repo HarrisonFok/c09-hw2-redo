@@ -13,7 +13,7 @@
         // api.initImages()
 
         api.getAllImages(function(error, response) {
-            console.log(response)
+            // console.log(response)
             images = response
 
             putCurrImg()
@@ -40,7 +40,6 @@
 
             // Put up image
             function putCurrImg() {
-                console.log("putCurrImg: ", api.getAllImages())
                 if (images.length === 0) {
                     imagesDiv.innerHTML = `<p class="center">No images to show</p>`
                     commentsDiv.innerHTML = ""
@@ -77,9 +76,7 @@
                         api.deleteImage(parseInt(imageID))
                         console.log("After API delete call")
                         currImgOffset--;
-                        if (currImgOffset < 0) {
-                        currImgOffset = 0;
-                        }
+                        if (currImgOffset < 0) currImgOffset = 0;
                         putCurrImg()
                     })
 
@@ -88,9 +85,7 @@
                     prevBtn.addEventListener("click", function(event) {
                         event.preventDefault()
                         currImgOffset--
-                        if (currImgOffset < 0) {
-                            currImgOffset = 0;
-                        }
+                        if (currImgOffset < 0) currImgOffset = 0;
                         putCurrImg()
                     })
 
@@ -103,9 +98,10 @@
                     })
 
                     api.getComments(currImg._id, currCommPage, function(paginatedComments) {
-                        let currentComemnts = paginatedComments
+                        let currentComments = paginatedComments
                         commentsDiv.innerHTML = ""
-                        if (currentComemnts.length > 0) putComments(currentComemnts)
+                        if (currentComments !== null)
+                            if (currentComments.length > 0) putComments(currentComments)
                     })
 
                     currImgID = currImg._id
@@ -134,7 +130,7 @@
             event.preventDefault()
             let commentAuthor = document.getElementById("commentAuthorName").value
             let commentContent = document.getElementById("commentText").value
-            if (commentAuthor !== "" && commentContent !== "" && api.getAllImages().length !== 0) {
+            if (commentAuthor !== "" && commentContent !== "" && images.length !== 0) {
                 api.addComment(currImgID, commentAuthor, commentContent)
             }
         })
@@ -143,10 +139,8 @@
         document.querySelector(".commentsPrevBtn").addEventListener("click", function(event) {
             event.preventDefault()
             currCommPage--
-            if (currCommPage < 0) {
-                currCommPage = 0
-            }
-            let currImg = api.getAllImages()[currImgOffset]
+            if (currCommPage < 0) currCommPage = 0
+            let currImg = images[currImgOffset]
             let currentComemnts = api.getComments(currImg.imageID, currCommPage)
             putComments(currentComemnts)
         })
@@ -155,7 +149,7 @@
         document.querySelector(".commentsNextBtn").addEventListener("click", function(event) {
             event.preventDefault()
             currCommPage++
-            let currImg = api.getAllImages()[currImgOffset]
+            let currImg = images[currImgOffset]
             let currentComemnts = api.getComments(currImg.imageID, currCommPage)
             putComments(currentComemnts)
         })
@@ -163,6 +157,7 @@
         function putComments(comments) {
             // Ensure that the comments div is empty
             document.querySelector(".comments").innerHTML = ""
+            console.log("comments: ", comments)
             // For every comment, put it on the screen
             comments.forEach(function(comment) {
                 // Create a new div for every comment
@@ -185,7 +180,7 @@
                 `
                 // Add an event listener to the delete button in the comment div
                 div.querySelector(".deleteButton").addEventListener("click", function(event) {
-                    api.deleteComment(comment.commentId)
+                    api.deleteComment(currImgID, comment._id)
                 })
                 // Add the div to the comments div
                 document.querySelector(".comments").append(div)

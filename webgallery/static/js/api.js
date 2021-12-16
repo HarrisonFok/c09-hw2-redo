@@ -69,71 +69,42 @@ let api = (function(){
     
     // add a comment to an image
     module.addComment = function(imageId, author, content, callback){
-        console.log(imageId, author, content)
         send("POST", `/api/images/${imageId}/comments`, { imageId, author, content }, callback)
-        /*
-        let date = new Date()
-        data.commentsCount++
-        let newComment = {
-            commentId: data.commentId,
-            imageID: imageId,
-            author,
-            content,
-            date: date.toDateString() + " " + date.toTimeString().split(" ")[0]
-        }
-        // Add the new comment to the local storage data
-        data.comments.push(newComment)
-        // Update local storage
-        localStorage.setItem("data", JSON.stringify(data))
-        notifyCommentListeners(newComment)
-        return newComment
-        */
     }
 
     // get 10 comments per page
     module.getComments = function(currImgID, page=0, callback) {
-        send("GET", `/api/images/${currImgID}/comments`, null, callback)
-        /*
-        let commentsPerPage = 10
-        let commentsForImg = data.comments.filter(comment => comment.imageId === currImgID).reverse()
-        let numPages = Math.ceil(commentsForImg.length / commentsPerPage)
-        let paginatedComments = []
-        if (page <= numPages) {
-            // Calculate starting comment index
-            let startIndexPage = page * commentsPerPage
-            // Add 10 to that
-            let endIndexPage = startIndexPage + 10
-            // Get those
-            paginatedComments = commentsForImg.slice(startIndexPage, endIndexPage)
-        }
-        return paginatedComments
-        */
+        send("GET", `/api/images/${currImgID}/comments`, null, function(err, res) {
+            // console.log(res)
+            if (err) notifyErrorListeners(err)
+            let comments = res
+            let commentsPerPage = 10
+            // The comments list goes from latest to earliest, but we want the reverse
+            let commentsForImg = comments.filter(comment => comment.imageId === currImgID).reverse()
+            let numPages = Math.ceil(commentsForImg.length / commentsPerPage)
+
+            let paginatedComments = []
+            if (page <= numPages) {
+                // Calculate starting comment index
+                let startIndexPage = page * commentsPerPage
+                // Add 10 to that
+                let endIndexPage = startIndexPage + 10
+                // Get those
+                paginatedComments = commentsForImg.slice(startIndexPage, endIndexPage)
+            }
+
+            callback(paginatedComments)
+        })
     }
     
     // delete a comment to an image
-    module.deleteComment = function(imageId, commentId, callback){
-        send("DELETE", `/api/images/${imageId}/comments/${commentId}`, null, callback)
-        /*
-        let deletedComment = null
-        deletedComment = data.comments.filter(comment => comment.commentId === commentId)
-        data.comments = data.comments.filter(comment => comment.commentId !== commentId)
-        localStorage.setItem("data", JSON.stringify(data))
-        notifyCommentListeners(deletedComment)
-        */
-    }
-
-    let imageHandlers = [];
-
-    // notify all image listeners
-    function notifyImageListeners() {
-      imageHandlers.forEach(function(handler) {
-        handler(data.images);
-      });
-    }
-
-    // call handler when an image is added or deleted from the gallery
-    module.onImageUpdate = function(handler){
-        imageHandlers.push(handler)
+    module.deleteComment = function(imageId, commentId){
+        // console.log(imageId, commentId)
+        send("DELETE", `/api/images/${imageId}/comments/${commentId}`, null, function(err, res) {
+            if (err) notifyErrorListeners(err)
+            let deletedComment = res
+            notifyCommentListeners(deletedComment)
+        })
     }
   
     let commentHandlers = [];
@@ -163,6 +134,23 @@ let api = (function(){
     module.onError = function(listener) {
         errorHandlers.push(listener)
     }
+
+    // =========================================
+    // Not used but here just in case 
+    let imageHandlers = [];
+
+    // notify all image listeners
+    function notifyImageListeners() {
+      imageHandlers.forEach(function(handler) {
+        handler(data.images);
+      });
+    }
+
+    // call handler when an image is added or deleted from the gallery
+    module.onImageUpdate = function(handler){
+        imageHandlers.push(handler)
+    }
+    // =========================================
     
     return module;
 })();
