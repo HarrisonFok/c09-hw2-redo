@@ -19,52 +19,52 @@ let api = (function(){
     
     ****************************** */ 
 
-    module.initImages = () => {
-        if (!localStorage.getItem("data")) {
-            data = {
-                imagesCount: 0,
-                images: [],
-                commentsCount: 0,
-                comments: []
-            }
-            localStorage.setItem("data", JSON.stringify(data))
-        } else {
-            data = JSON.parse(localStorage.getItem("data"))
+    function sendFiles(method, url, data, callback){
+        let formdata = new FormData();
+        Object.keys(data).forEach(function(key){
+            let value = data[key];
+            formdata.append(key, value);
+        });
+        let xhr = new XMLHttpRequest();
+        xhr.onload = function() {
+            if (xhr.status !== 200) callback("[" + xhr.status + "]" + xhr.responseText, null);
+            else callback(null, JSON.parse(xhr.responseText));
+        };
+        xhr.open(method, url, true);
+        xhr.send(formdata);
+    }
+    
+    function send(method, url, data, callback){
+        let xhr = new XMLHttpRequest();
+        xhr.onload = function() {
+            if (xhr.status !== 200) callback("[" + xhr.status + "]" + xhr.responseText, null);
+            else callback(null, JSON.parse(xhr.responseText));
+        };
+        xhr.open(method, url, true);
+        if (!data) xhr.send();
+        else{
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(data));
         }
-        return data
     }
     
     // add an image to the gallery
-    module.addImage = function(title, author, url){
-        console.log(title, author, url)
-        let date = new Date()
-        data.imagesCount++
-        let newImage = {
-            imageID: data.imagesCount,
-            title,
-            author,
-            url,
-            date: date.toDateString() + " " + date.toTimeString().split(" ")[0]
-        }
-        // Add the new image to the local storage data
-        data.images.push(newImage)
-        // Update local storage
-        localStorage.setItem("data", JSON.stringify(data))
-        notifyImageListeners()
-        return newImage
+    module.addImage = function(title, author, url, callback){
+        sendFiles("POST", "/api/images", { title, author, url }, callback)
     }
 
-    module.getAllImages = function() {
-        return data.images
+    module.getAllImages = function(callback) {
+        // return data.images
+        send("GET", "/api/images", null, callback)
+    }
+
+    module.getImage = function(imageId, callback) {
+        send("GET", "/api/images/" + imageId + "/", null, callback)
     }
     
     // delete an image from the gallery given its imageId
-    module.deleteImage = function(imageId){
-        console.log(imageId, typeof(imageId))
-        if (data.imagesCount >= 0) data.imagesCount--
-        data.images = data.images.filter(img => img.imageID !== imageId)
-        localStorage.setItem("data", JSON.stringify(data))
-        notifyImageListeners()
+    module.deleteImage = function(imageId, callback){
+        send("DELETE", "/api/images/" + imageId + "/", null, callback)
     }
     
     // add a comment to an image
