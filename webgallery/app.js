@@ -17,9 +17,8 @@ const commentsDB = new Datastore({ filename: "db/comments.db", autoload: true, t
 app.post("/api/images/", upload.single("picture"), function(req, res, next) {
     console.log(req.body)
     const { title, author, url } = req.body
-    if (title === "" || author === "" || url === "") {
-        res.status(400).json({message: "All fields required"})
-    } else {
+    if (title === "" || author === "" || url === "") res.status(400).json({message: "All fields required"})    
+    else {
         let image = { title, author, url}
         console.log(image)
         imagesDB.insert(image, function(err, newImage) {
@@ -50,6 +49,8 @@ app.get("/api/images/:imageId", function(req, res, next) {
     })
 })
 
+// MISSING GET RAW PICTURE
+
 app.delete("/api/images/:imageId", function(req, res, next) {
     const imageID = req.params.imageId
     imagesDB.findOne({ _id: imageID }, function(err, image) {
@@ -68,6 +69,86 @@ app.delete("/api/images/:imageId", function(req, res, next) {
                 })
                 res.setHeader("content-type", "application/json")
                 res.json(image)
+            })
+        }
+    })
+})
+
+app.post("/api/images/:imageId/comments", function(req, res, next) {
+    console.log(req.body.imageId, req.body.content, req.body.author)
+    const { imageId, content, author } = req.body
+    if (author === "" || content === "") res.status(400).json({message: "All fields required"})
+    else if (imageId !== req.params.imageId) res.status(400).json({message: "The ID in the URL doesn't match the one provided in the body"})
+    else {
+        imagesDB.findOne({ _id: imageId }, function(err, image) {
+            if (!image) {
+                res.setHeader("content-type", "application/json")
+                res.status(404).json({ message: "Cannot add a comment to an image that doesn't exist" })
+            } else {
+                let comment = { imageId, content, author }
+                console.log(comment)
+                commentsDB.insert(comment, function(err, newComment) {
+                    res.setHeader("content-type", "application/json")
+                    res.json(newComment)
+                })
+            }
+        })
+    }
+})
+
+app.get("/api/images/:imageId/comments/:commentId", function(req, res, next) {
+    imagesDB.findOne({ _id: req.params.imageId }, function(err, image) {
+        if (!image) {
+            res.setHeader("content-type", "application/json")
+            res.status(404).json({ message: "Image does not exist" })
+        } else {
+            commentsDB.findOne({ _id: req.params.commentId }, function(err, comment) {
+                if (!comment) {
+                    res.setHeader("content-type", "application/json")
+                    res.status(404).json({ message: "Comment does not exist" })
+                } else {
+                    res.setHeader("content-type", "application/json")
+                    res.json(comment)
+                }
+            })
+        }
+    })
+})
+
+app.get("/api/images/:imageId/comments", function(req, res, next) {
+    const imageID = req.params.imageId
+    imagesDB.findOne({ _id: imageID }, function(err, image) {
+        if (!image) {
+            res.setHeader("content-type", "application/json")
+            res.status(404).message({ message: "Image does not exist" })
+        } else {
+            commentsDB.find({ imageId: imageID }, function(err, comments) {
+                res.setHeader("content-type", "application/json")
+                res.json(comments)
+            })
+        }
+    })
+})
+
+app.delete("/api/images/:imageId/comments/:commentId", function(req, res, next) {
+    const { imageId, commentId } = req.params
+    imagesDB.findOne({ _id: imageId }, function(err, image) {
+        if (!image) {
+            res.setHeader("content-type", "application/json")
+            res.status(404).json({ message: "Image does not exist" })
+        } else {
+            commentsDB.findOne({ _id: commentId }, function(err, comment) {
+                if (!comment) {
+                    res.setHeader("content-type", "application/json")
+                    res.status(404).json({ message: "Comment does not exist" })
+                } else {
+                    commentsDB.remove({ _id: commentId }, {}, function(err, numRemoved) {
+                        if (numRemoved > 0) {
+                            res.setHeader("content-type", "application/json")
+                            res.json(comment)
+                        }
+                    })
+                }
             })
         }
     })

@@ -68,8 +68,10 @@ let api = (function(){
     }
     
     // add a comment to an image
-    module.addComment = function(imageId, author, content){
+    module.addComment = function(imageId, author, content, callback){
         console.log(imageId, author, content)
+        send("POST", `/api/images/${imageId}/comments`, { imageId, author, content }, callback)
+        /*
         let date = new Date()
         data.commentsCount++
         let newComment = {
@@ -85,10 +87,13 @@ let api = (function(){
         localStorage.setItem("data", JSON.stringify(data))
         notifyCommentListeners(newComment)
         return newComment
+        */
     }
 
     // get 10 comments per page
-    module.getComments = function(currImgID, page=0) {
+    module.getComments = function(currImgID, page=0, callback) {
+        send("GET", `/api/images/${currImgID}/comments`, null, callback)
+        /*
         let commentsPerPage = 10
         let commentsForImg = data.comments.filter(comment => comment.imageId === currImgID).reverse()
         let numPages = Math.ceil(commentsForImg.length / commentsPerPage)
@@ -102,15 +107,19 @@ let api = (function(){
             paginatedComments = commentsForImg.slice(startIndexPage, endIndexPage)
         }
         return paginatedComments
+        */
     }
     
     // delete a comment to an image
-    module.deleteComment = function(commentId){
+    module.deleteComment = function(imageId, commentId, callback){
+        send("DELETE", `/api/images/${imageId}/comments/${commentId}`, null, callback)
+        /*
         let deletedComment = null
         deletedComment = data.comments.filter(comment => comment.commentId === commentId)
         data.comments = data.comments.filter(comment => comment.commentId !== commentId)
         localStorage.setItem("data", JSON.stringify(data))
         notifyCommentListeners(deletedComment)
+        */
     }
 
     let imageHandlers = [];
@@ -140,6 +149,20 @@ let api = (function(){
     module.onCommentUpdate = function(handler) {
       commentHandlers.push(handler);
     };
+
+    let errorHandlers = []
+
+    // notify all error listeners
+    function notifyErrorListeners(error) {
+        errorHandlers.forEach(function(listener) {
+            listener(error)
+        })
+    }
+
+    // call handler when there's an error
+    module.onError = function(listener) {
+        errorHandlers.push(listener)
+    }
     
     return module;
 })();
