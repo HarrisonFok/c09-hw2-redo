@@ -15,11 +15,11 @@ const imagesDB = new Datastore({ filename: "db/images.db", autoload: true, times
 const commentsDB = new Datastore({ filename: "db/comments.db", autoload: true, timestampData: true })
 
 app.post("/api/images/", upload.single("picture"), function(req, res, next) {
-    console.log(req.body)
-    const { title, author, url } = req.body
-    if (title === "" || author === "" || url === "") res.status(400).json({message: "All fields required"})    
+    console.log("req.file: ", req.file)
+    const { title, author } = req.body
+    if (title === "" || author === "" ) res.status(400).json({message: "All fields required"})    
     else {
-        let image = { title, author, url}
+        let image = { title, author, picture: req.file }
         console.log(image)
         imagesDB.insert(image, function(err, newImage) {
             // After insert, set the header and respond with the status

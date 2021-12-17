@@ -50,6 +50,7 @@
                     // Put up the image
                     let currImg = images[currImgOffset]
                     console.log(currImg)
+                    if (!currImg) return
                     imagesDiv.innerHTML = `
                         <div>
                         <img src="${currImg.url}" />

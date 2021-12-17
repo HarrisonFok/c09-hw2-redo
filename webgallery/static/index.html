@@ -15,7 +15,7 @@
         value="Hide/Show Image Form"
         name="hideImageFormBtn"
       />
-      <form class="createImgForm">
+      <form class="createImgForm" action="/api/images/" method="post" enctype="multipart/form-data">
         <div class="toggleHiddenElmts">
           <label for="imageTitle">Image Title</label>
           <input
@@ -45,7 +45,7 @@
           <input
             type="file"
             id="imageURL"
-            name="imageURL"
+            name="picture"
             class="imageFormURL"
             accept="image/*"
             required
