@@ -24,8 +24,8 @@
                 event.preventDefault()
                 let imageTitle = document.getElementById("imageTitle").value
                 let imageAuthor = document.getElementById("imageAuthor").value
-                let imageURL = document.getElementById("imageURL").value
-                if (imageTitle != "" && imageAuthor != "" && imageURL != "") {
+                let imageURL = document.getElementById("imageURL").files[0]
+                if (imageTitle != "" && imageAuthor != "" && imageURL != undefined) {
                     api.addImage(imageTitle, imageAuthor, imageURL, function(err, res) {
                         document.querySelector(".createImgForm").reset()
                         api.getAllImages(function(err, res) {
@@ -161,11 +161,17 @@
             console.log("comments: ", comments)
             // For every comment, put it on the screen
             comments.forEach(function(comment) {
+                let currImg = images[currImgOffset];
                 // Create a new div for every comment
                 let div = document.createElement("div")
                 div.className = "comments " + `commentId${comment.commentId}`
                 div.innerHTML = `
                     <img src="media/user.png" />
+                    <div class="image">
+                        <img width="100%" src="/api/images/${
+                            currImg._id
+                        }/raw/" />
+                    </div>
                     <div>
                         Author: ${comment.author}                 
                     </div>

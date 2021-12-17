@@ -15,7 +15,7 @@
         value="Hide/Show Image Form"
         name="hideImageFormBtn"
       />
-      <form class="createImgForm" action="/api/images/" method="post" enctype="multipart/form-data">
+      <form class="createImgForm">
         <div class="toggleHiddenElmts">
           <label for="imageTitle">Image Title</label>
           <input
@@ -40,17 +40,19 @@
           />
         </div>
 
-        <div class="toggleHiddenElmts">
-          <label for="imageURL">Image URL</label>
-          <input
-            type="file"
-            id="imageURL"
-            name="picture"
-            class="imageFormURL"
-            accept="image/*"
-            required
-          />
-        </div>
+        <form action="/api/images/" method="post" enctype="multipart/form-data">
+          <div class="toggleHiddenElmts">
+            <label for="imageURL">Image URL</label>
+            <input
+              type="file"
+              id="imageURL"
+              name="picture"
+              class="imageFormURL"
+              accept="image/*"
+              required
+            />
+          </div>
+        </form>
 
         <input
           type="submit"

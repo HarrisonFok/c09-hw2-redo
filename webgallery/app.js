@@ -16,10 +16,11 @@ const commentsDB = new Datastore({ filename: "db/comments.db", autoload: true, t
 
 app.post("/api/images/", upload.single("picture"), function(req, res, next) {
     console.log("req.file: ", req.file)
+    console.log("req: ", req)
     const { title, author } = req.body
     if (title === "" || author === "" ) res.status(400).json({message: "All fields required"})    
     else {
-        let image = { title, author, picture: req.file }
+        let image = { title, author, url: req.file }
         console.log(image)
         imagesDB.insert(image, function(err, newImage) {
             // After insert, set the header and respond with the status
@@ -49,7 +50,18 @@ app.get("/api/images/:imageId", function(req, res, next) {
     })
 })
 
-// MISSING GET RAW PICTURE
+app.get("/api/images/:image_id/raw", function(req, res, next) {
+    console.log("res: ", res)
+    imagesDB.findOne({ _id: req.params.image_id }, function(err, res) {
+        if (!res) {
+            res.status("content-type", "application/json")
+            res.status(404).json({ message: "Image does not exist" })
+        } else {
+            // res.setHeader("content-type", )
+            // res.sendFile(doc.picture.path)
+        }
+    })
+})
 
 app.delete("/api/images/:imageId", function(req, res, next) {
     const imageID = req.params.imageId
